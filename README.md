@@ -25,13 +25,13 @@ This repository contains SQL solutions for the Data Analytics Assessment. The as
 
 #### Approach
 
--  I joined the `users_customuser` table (`u`) with the `savings_savingsaccount` table (`s`) on `u.id = s.owner_id` to associate each saving transaction with its owner.
+-**Step 1:** I joined the `users_customuser` table (`u`) with the `savings_savingsaccount` table (`s`) on `u.id = s.owner_id` to associate each saving transaction with its owner.
 
-- To identify savings plans, I joined `savings_savingsaccount` (`s`) to `plans_plan` (`p_savings`) where `p_savings.is_regular_savings = 1`. To identify investment plans, I joined `users_customuser` (`u`) to `plans_plan` (`p`) where `p.is_a_fund = 1`.
+**Step 2:** To identify savings plans, I joined `savings_savingsaccount` (`s`) to `plans_plan` (`p_savings`) where `p_savings.is_regular_savings = 1`. To identify investment plans, I joined `users_customuser` (`u`) to `plans_plan` (`p`) where `p.is_a_fund = 1`.
 
-- I applied filters to include only funded accounts where `(s.confirmed_amount - s.deduction_amount) > 0` for savings and `p.amount > 0` for investments.
+**Step 3:** I applied filters to include only funded accounts where `(s.confirmed_amount - s.deduction_amount) > 0` for savings and `p.amount > 0` for investments.
 
-- Using `inner join` I ensured only customers having both savings and investment plans are selected. Finally, I grouped by customer and summed deposits to prioritize high-value customers.
+**Step 4:** Using `inner join` I ensured only customers having both savings and investment plans are selected. Finally, I grouped by customer and summed deposits to prioritize high-value customers.
 
 
 #### Challenges
@@ -113,19 +113,20 @@ The results are aggregated to show the number of customers in each category and 
 ```
 
 #### Approach
-**1. Identify Active Plans:** I queried the `plans_plan` table to extract only active plans that are either:
+**Step 1. Identify Active Plans:** I queried the `plans_plan` table to extract only active plans that are either:
   - Savings Plans (is_regular_savings = 1)
   - Investment Plans (is_fixed_investment = 1 or is_a_fund = 1)
 
 I excluded any plans marked as archived or deleted.
 
-**2. Fetch Last Inflow Transaction:** From the `savings_savingsaccount` table, I selected only inflow transactions—those where `confirmed_amount - deduction_amount > 0.` For each plan, I computed the most recent transaction date (MAX(transaction_date)).
+**Step 2. Fetch Last Inflow Transaction:** From the `savings_savingsaccount` table, I selected only inflow transactions—those where `confirmed_amount - deduction_amount > 0.` For each plan, I computed the most recent transaction date (MAX(transaction_date)).
 
-**3. Join and Filter:** I performed a LEFT JOIN between active plans and their last inflow transaction date. This allows me to:
+**Step 3. Join and Filter:** I performed a LEFT JOIN between active plans and their last inflow transaction date. This allows me to:
   - Catch plans that have never received any inflow (null join result).
   - Calculate the number of inactivity days using DATEDIFF(CURDATE(), last_transaction_date).
 
-**4. Apply Inactivity Rule:** Plans are flagged if:
+**Step 4. Apply Inactivity Rule:** 
+Plans are flagged if:
   - They have no transaction history, or their last inflow was more than 365 days ago.
 
 
@@ -159,8 +160,16 @@ I excluded any plans marked as archived or deleted.
 
 #### Approach
 
-**1. Calculate Account Tenure:** I computed the total number of months since each customer signed up `(timestampdiff(month, date_joined, curdate()))`, which serves as the account tenure.
+**Step 1. Calculate Account Tenure:** I computed the total number of months since each customer signed up `(timestampdiff(month, date_joined, curdate()))`, which serves as the account tenure.
 
-**2. Count Total Transactions:** I counted all valid inflow transactions where the net transaction amount `(confirmed_amount - deduction_amount)` is positive, indicating money added to the account.
+**Step 2. Count Total Transactions:** I counted all valid inflow transactions where the net transaction amount `(confirmed_amount - deduction_amount)` is positive, indicating money added to the account.
 
-**3. Compute Average Profit per Transaction:** I calculated the average profit per transaction by assuming a fixed profit margin of 0.1% of the transaction value `(avg((confirmed_amount - deduction_amount) * 0.001))`.
+**Step 3. Compute Average Profit per Transaction:** I calculated the average profit per transaction by assuming a fixed profit margin of 0.1% of the transaction value `(avg((confirmed_amount - deduction_amount) * 0.001))`.
+
+## Conclusion
+
+This assessment demonstrates my ability to write accurate, efficient, and well-structured SQL queries to solve business problems involving multiple relational tables. 
+
+Each query addresses the specified scenario by leveraging joins, aggregations, filtering, and conditional logic to extract actionable insights. The solutions reflect careful attention to query optimization, readability, and completeness in line with the evaluation criteria. 
+
+This exercise reinforces key data analyst skills in working with transactional and customer data to support business decision-making.
